@@ -1,7 +1,7 @@
 // Local headers
 #include "program.hpp"
 #include "gloom/gloom.hpp"
-GLuint createVAO(GLfloat* vertices, GLuint* indices) {
+GLuint createVAO(GLfloat* vertices, int size,GLuint* indices) {
 	GLuint array;
 	GLuint buffer;
 	GLuint buffer2;
@@ -12,7 +12,7 @@ GLuint createVAO(GLfloat* vertices, GLuint* indices) {
 	//Create buffer
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 9, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size, vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -21,7 +21,7 @@ GLuint createVAO(GLfloat* vertices, GLuint* indices) {
 
 	glGenBuffers(1, &buffer2);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 3, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 15, indices, GL_STATIC_DRAW);
 	return(array);
 
 }
@@ -29,9 +29,15 @@ GLuint createVAO(GLfloat* vertices, GLuint* indices) {
 void runProgram(GLFWwindow* window)
 {
 
-	GLfloat vertices[] = { -0.6, -0.6, 0, 0.6, -0.6, 0, 0.6, 0,0 };
-	GLuint indices[] = { 0,1,2 };
-	GLuint vao = createVAO(vertices, indices);
+	GLfloat vertices1[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
+							0.6, 0.6, 0, 0, 0.6, 0, 0, 0, 0 ,
+							-0.8, 0.3, 0, -0.2, 0.3, 0, -0.8, 0.8, 0,  
+							-0.6, 0, 0, -0.6, -0.3, 0, -0.5, 0,0,
+		-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
+	GLfloat vertices[] = { 1, 0, 0, 1, -0.6, 0, -0.5, 0,0 };
+
+	GLuint indices[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+	GLuint vao = createVAO(vertices, 9*5,indices);
 	printGLError();
 
     // Set GLFW callback mechanism(s)
@@ -57,8 +63,8 @@ void runProgram(GLFWwindow* window)
 
         // Draw your scene here
 		glBindVertexArray(vao);
-		// Draw your scene here
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        // Draw your scene here
+		glDrawElements(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
         // Handle other events
