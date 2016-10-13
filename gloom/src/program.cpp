@@ -30,28 +30,26 @@ GLuint createVAO(GLfloat* vertices, int size,GLuint* indices) {
 void runProgram(GLFWwindow* window)
 {
 
-	Gloom::Shader shader;
-	shader.makeBasicShader("gloom/shaders/.vert",
-		"gloom/shaders/.frag");
+	Gloom::Shader shader;shader.makeBasicShader("../gloom/shaders/simple.vert","../gloom/shaders/simple.frag");
 	GLfloat vertices1[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
 							0.6, 0.6, 0, 0, 0.6, 0, 0, 0, 0 ,
 							-0.8, 0.3, 0, -0.2, 0.3, 0, -0.8, 0.8, 0,  
 							-0.6, 0, 0, -0.6, -0.3, 0, -0.5, 0,0,
 		-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
 
-	GLfloat vertices2[] = {	
+	GLfloat vertices[] = {	
 							-0.3, 0, 0,
 							-0.6, -0.6, 0,
 							-0.3, -0.6, 0
 		 };
-	GLfloat vertices[] = {
+	GLfloat vertice2[] = {
 		0.6, -0.8, -1.2,
 		0, 0.4, 0,
 		-0.8, -0.2, 1.2
 	};
 
-	//GLuint indices[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-	GLuint indices[] = { 0,1,2};
+	GLuint indices[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+	//GLuint indices[] = { 0,1,2};
 
 	GLuint vao = createVAO(vertices, 9*5,indices);
 	printGLError();
