@@ -46,14 +46,31 @@ void runProgram(GLFWwindow* window)
 	GLfloat RGBA[] = { 
 		1,0,0,1,
 		0,1,0,1,
-		0,0,1,1 
+		0,0,1,1,
+
+		1,0,0,1,
+		0,1,0,1,
+		0,0,1,1,
+		
+		1,0,0,1,
+		0,1,0,1,
+		0,0,1,1,
+		
+		1,0,0,1,
+		0,1,0,1,
+		0,0,1,1,
+
+		1,0,0,1,
+		0,1,0,1,
+		0,0,1,1,
+
 	};
 	//All 5 triangles
 	GLfloat vertices1[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
 							0.6, 0.6, 0, 0, 0.6, 0, 0, 0, 0 ,
 							-0.8, 0.3, 0, -0.2, 0.3, 0, -0.8, 0.8, 0,  
 							-0.6, 0, 0, -0.6, -0.3, 0, -0.5, 0,0,
-		-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
+						-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
 
 	//1 Triangle for task 1c and 2d)
 	GLfloat vertices[] = {	
@@ -72,7 +89,7 @@ void runProgram(GLFWwindow* window)
 	//Indices for task 1c , 2d,c)
 	GLuint indices[] = { 0,1,2};
 	//Creat the VAO with vertices and with the sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
-	GLuint vao = createVAO(vertices,RGBA, 9*5,15,4*3,indices);
+	GLuint vao = createVAO(vertices,RGBA, 9*5,15,4*15,indices);
 	printGLError();
 
     // Set GLFW callback mechanism(s)
