@@ -2,18 +2,20 @@
 #include "program.hpp"
 #include "gloom/gloom.hpp"
 #include "gloom/shader.hpp"
-GLuint createVAO(GLfloat* vertices, int size,GLuint* indices) {
+GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices,int size_index,int size_RGB,GLuint* indices) {
 	GLuint array;
-	GLuint VBO;
+	GLuint VBO_vertices;
+	GLuint VBO_RGBA;
+
 	GLuint IB;
 
 	//Create VAO
 	glGenVertexArrays(1, &array);
 	glBindVertexArray(array);
-	//Create buffer
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size, vertices, GL_STATIC_DRAW);
+	//Create vertice buffer
+	glGenBuffers(1, &VBO_vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertices);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_vertices, vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -22,7 +24,17 @@ GLuint createVAO(GLfloat* vertices, int size,GLuint* indices) {
 
 	glGenBuffers(1, &IB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 15, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size_index, indices, GL_STATIC_DRAW);
+
+	//Create RGBA buffer
+	glGenBuffers(1, &VBO_RGBA);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_RGBA);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_RGB, RGBA, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(1);
+
+
 	return(array);
 
 }
@@ -31,27 +43,36 @@ void runProgram(GLFWwindow* window)
 {
 
 	Gloom::Shader shader;shader.makeBasicShader("../gloom/shaders/simple.vert","../gloom/shaders/simple.frag");
+	GLfloat RGBA[] = { 
+		1,0,0,1,
+		0,1,0,1,
+		0,0,1,1 
+	};
+	//All 5 triangles
 	GLfloat vertices1[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
 							0.6, 0.6, 0, 0, 0.6, 0, 0, 0, 0 ,
 							-0.8, 0.3, 0, -0.2, 0.3, 0, -0.8, 0.8, 0,  
 							-0.6, 0, 0, -0.6, -0.3, 0, -0.5, 0,0,
 		-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
 
+	//1 Triangle for task 1c and 2d)
 	GLfloat vertices[] = {	
 							-0.3, 0, 0,
 							-0.6, -0.6, 0,
 							-0.3, -0.6, 0
 		 };
+	//Triangle for task 1d)
 	GLfloat vertice2[] = {
 		0.6, -0.8, -1.2,
 		0, 0.4, 0,
 		-0.8, -0.2, 1.2
 	};
-
-	GLuint indices[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-	//GLuint indices[] = { 0,1,2};
-
-	GLuint vao = createVAO(vertices, 9*5,indices);
+	//indices for all 5 triangles
+	GLuint indices1[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+	//Indices for task 1c , 2d,c)
+	GLuint indices[] = { 0,1,2};
+	//Creat the VAO with vertices and with the sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
+	GLuint vao = createVAO(vertices,RGBA, 9*5,15,4*3,indices);
 	printGLError();
 
     // Set GLFW callback mechanism(s)
@@ -75,14 +96,14 @@ void runProgram(GLFWwindow* window)
         // Clear colour and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         // Draw your scene here
 		// Activate shader program
-		shader.activate();
 		glBindVertexArray(vao);
-        // Draw your scene here
+
+		shader.activate();
 		glDrawElements(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0);
 	
-
 		glBindVertexArray(0);
 	
 
