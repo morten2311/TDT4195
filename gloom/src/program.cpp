@@ -3,12 +3,20 @@
 #include "gloom/gloom.hpp"
 #include "gloom/shader.hpp"
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+
+
+#include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 //Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, .5f);
+GLfloat rotationY = 0;
+GLfloat rotationX = 0;
+
+glm::mat4x4 matrix;
+
 
 GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices,int size_index,int size_RGB,GLuint* indices) {
 	GLuint array;
@@ -135,14 +143,13 @@ void runProgram(GLFWwindow* window)
 		shader.activate();
 
 		//Uniform Transformation
-		glm::mat4x4 IDmatrix(1.0);
-		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(IDmatrix));
+		glm::mat4x4 mat= glm::rotate(rotationY, glm::vec3(1, 0, 0));
+		glm::mat4x4 mat2 = glm::translate(rotationY, glm::vec3(1, 0, 0));
 
+		glm::mat4x4 trans(1.0);
+		trans = trans*rotate*mat;
 
-		//Transform to camera coordinate system
-		glm::mat4 view;
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
+		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans));
 
 
 		glDrawElements(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0);
@@ -163,12 +170,48 @@ void runProgram(GLFWwindow* window)
 }
 
 
+  void rotateHorizontally() {
+	  rotationY+=10;
 
 
+}
+glm::mat4x4 rotateVertically() {
+
+	return glm::rotate(90.0f, glm::vec3(1.0, 0,0));
+
+}
+glm::mat4x4 translateXleft() {
+	return glm::translate(glm::vec3(0.05,0,0));
+
+}
+glm::mat4x4 translateXright() {
+	return glm::translate(glm::vec3(-0.05, 0, 0));
+
+}
+glm::mat4x4 translateYdown() {
+	return glm::translate(glm::vec3(0, 0.1, 0));
+
+}
+glm::mat4x4 translateYup() {
+	return glm::translate(glm::vec3(0, -0.1, 0));
+
+}
+glm::mat4x4 translateZforward() {
+	return glm::translate(glm::vec3(0, 0, 0.1));
+
+
+}
+glm::mat4x4 translateZbackward() {
+	return glm::translate(glm::vec3(0, 0, -0.1));
+
+
+}
 
 void keyboardCallback(GLFWwindow* window, int key, int scancode,
-                      int action, int mods)
+	int action, int mods)
+	
 {
+	
     // Use escape key for terminating the GLFW window
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
@@ -179,45 +222,49 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
 	//Move left
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		translateXleft();
 
 	}   
 	//Move right
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		matrix = translateXright();
+
 	}  
 	//Move up
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		matrix = translateYup();
+
 	}   
 	//Move down
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		matrix = translateYdown();
+
 	}
 
 	//Move forward
-	if (key == GLFW_KEY_LEFT_SHIFT && key == GLFW_KEY_UP && action == GLFW_PRESS)
+	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		matrix = translateZforward();
 	}   
 	//Move backward
-	if (key == GLFW_KEY_LEFT_SHIFT && key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	if ( key == GLFW_KEY_S && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		matrix = translateZbackward();
+
 	}   
 
 	//Rotate horizontally
-	if ((key == GLFW_KEY_LEFT_SHIFT && (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT)) && action == GLFW_PRESS)
+	if (key == GLFW_KEY_H && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
 	//Rotate vertically
-	if ((key == GLFW_KEY_LEFT_SHIFT && (key == GLFW_KEY_UP || key == GLFW_KEY_DOWN)) && action == GLFW_PRESS)
+	if (key == GLFW_KEY_V && action == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		rotateVertically();
+
 	}
 }
