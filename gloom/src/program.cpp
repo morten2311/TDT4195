@@ -9,7 +9,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/vec3.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 //Camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, .5f);
 GLfloat rotationY = 0;
@@ -57,6 +58,9 @@ GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices,int size_in
 
 void runProgram(GLFWwindow* window)
 {
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+
 
 
     // Set GLFW callback mechanism(s)
@@ -120,11 +124,10 @@ void runProgram(GLFWwindow* window)
 	GLuint indices1[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 };
 	//Indices for task 1c , 2d,c)
 	GLuint indices[] = { 0,1,2 };
-	//Creat the VAO with vertices and with the sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
+
+	//Creat the VAO with vertices and RGBA values, sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
 	GLuint vao = createVAO(vertices, RGBA, 9 * 5, 15, 4 * 15, indices);
 	printGLError();
-
-
 
 
 
@@ -143,11 +146,22 @@ void runProgram(GLFWwindow* window)
 		shader.activate();
 
 		//Uniform Transformation
-		glm::mat4x4 mat= glm::rotate(rotationY, glm::vec3(1, 0, 0));
-		glm::mat4x4 mat2 = glm::translate(rotationY, glm::vec3(1, 0, 0));
+		glm::mat4x4 rotateVert = glm::rotate(glm::radians(rotationY), glm::vec3(1, 0, 0));
+		glm::mat4x4 rotateHor = glm::rotate(glm::radians(rotationX), glm::vec3(0, 1, 0));
+
+		glm::mat4x4 translate = glm::translate( glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
+		glm::mat4x4 scale = glm::scale(glm::vec3(1, 1, 1));
+		//Projection and view
+		glm::mat4 view;
+		// Note that we're translating the scene in the reverse direction of where we want to move
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+		glm::mat4 model;
+		model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4x4 persp = glm::perspective(glm::radians(45.0f), GLfloat( windowWidth)/GLfloat(windowHeight),1.0f, 100.0f);
+		glm::mat4x4 ortho = glm::ortho(-1.0f,1.0f,-1.0f, 1.0f, 1.0f, 100.0f);
 
 		glm::mat4x4 trans(1.0);
-		trans = trans*rotate*mat;
+		trans = ortho*view*translate*rotateVert*rotateHor*trans;
 
 		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans));
 
@@ -170,43 +184,9 @@ void runProgram(GLFWwindow* window)
 }
 
 
-  void rotateHorizontally() {
-	  rotationY+=10;
 
 
-}
-glm::mat4x4 rotateVertically() {
-
-	return glm::rotate(90.0f, glm::vec3(1.0, 0,0));
-
-}
-glm::mat4x4 translateXleft() {
-	return glm::translate(glm::vec3(0.05,0,0));
-
-}
-glm::mat4x4 translateXright() {
-	return glm::translate(glm::vec3(-0.05, 0, 0));
-
-}
-glm::mat4x4 translateYdown() {
-	return glm::translate(glm::vec3(0, 0.1, 0));
-
-}
-glm::mat4x4 translateYup() {
-	return glm::translate(glm::vec3(0, -0.1, 0));
-
-}
-glm::mat4x4 translateZforward() {
-	return glm::translate(glm::vec3(0, 0, 0.1));
-
-
-}
-glm::mat4x4 translateZbackward() {
-	return glm::translate(glm::vec3(0, 0, -0.1));
-
-
-}
-
+//Move camera
 void keyboardCallback(GLFWwindow* window, int key, int scancode,
 	int action, int mods)
 	
@@ -222,49 +202,61 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
 	//Move left
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		translateXleft();
-
+		cameraPos.x += 0.05;
 	}   
 	//Move right
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 	{
-		matrix = translateXright();
+		cameraPos.x -= 0.05;
 
 	}  
 	//Move up
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 	{
-		matrix = translateYup();
+		cameraPos.y -= 0.05;
 
 	}   
 	//Move down
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
-		matrix = translateYdown();
+		cameraPos.y += 0.05;
+
 
 	}
 
 	//Move forward
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		matrix = translateZforward();
+		cameraPos.z += 0.05;
 	}   
 	//Move backward
 	if ( key == GLFW_KEY_S && action == GLFW_PRESS)
 	{
-		matrix = translateZbackward();
+		cameraPos.z -= 0.05;
 
 	}   
 
 	//Rotate horizontally
 	if (key == GLFW_KEY_H && action == GLFW_PRESS)
 	{
+		rotationX += 10;
+	}
+	//Rotate horizontally
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	{
+		rotationX -= 10;
 	}
 
 	//Rotate vertically
 	if (key == GLFW_KEY_V && action == GLFW_PRESS)
 	{
-		rotateVertically();
+		rotationY += 10;
+
+	}
+	//Rotate vertically
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		rotationY -= 10;
 
 	}
 }
