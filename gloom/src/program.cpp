@@ -12,7 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 //Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, .5f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -10.0f);
 GLfloat rotationY = 0;
 GLfloat rotationX = 0;
 
@@ -102,28 +102,23 @@ void runProgram(GLFWwindow* window)
 
 	};
 	//All 5 triangles
-	GLfloat vertices1[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
+	GLfloat vertices[] = { -0.6, -0.6, 0, -0.3, -0.6, 0, -0.3, 0,0,
 		0.6, 0.6, 0, 0, 0.6, 0, 0, 0, 0 ,
 		-0.8, 0.3, 0, -0.2, 0.3, 0, -0.8, 0.8, 0,
 		-0.6, 0, 0, -0.6, -0.3, 0, -0.5, 0,0,
 		-0.9, 0, 0, -0.9, -0.3, 0, -0.7, 0,0 };
 
-	//1 Triangle for task 1c and 2d)
-	GLfloat vertices[] = {
+	//Testing triangle
+	GLfloat vertices2[] = {
 		-0.3, 0, 0,
 		-0.6, -0.6, 0,
 		-0.3, -0.6, 0
 	};
-	//Triangle for task 1d)
-	GLfloat vertice2[] = {
-		0.6, -0.8, -1.2,
-		0, 0.4, 0,
-		-0.8, -0.2, 1.2
-	};
+
 	//indices for all 5 triangles
-	GLuint indices1[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 };
+	GLuint indices[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 };
 	//Indices for task 1c , 2d,c)
-	GLuint indices[] = { 0,1,2 };
+	GLuint indices2[] = { 0,1,2 };
 
 	//Creat the VAO with vertices and RGBA values, sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
 	GLuint vao = createVAO(vertices, RGBA, 9 * 5, 15, 4 * 15, indices);
@@ -148,21 +143,17 @@ void runProgram(GLFWwindow* window)
 		//Uniform Transformation
 		glm::mat4x4 rotateVert = glm::rotate(glm::radians(rotationY), glm::vec3(1, 0, 0));
 		glm::mat4x4 rotateHor = glm::rotate(glm::radians(rotationX), glm::vec3(0, 1, 0));
-
 		glm::mat4x4 translate = glm::translate( glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
 		glm::mat4x4 scale = glm::scale(glm::vec3(1, 1, 1));
-		//Projection and view
-		glm::mat4 view;
-		// Note that we're translating the scene in the reverse direction of where we want to move
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-		glm::mat4 model;
-		model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		
+		//projection
 		glm::mat4x4 persp = glm::perspective(glm::radians(45.0f), GLfloat( windowWidth)/GLfloat(windowHeight),1.0f, 100.0f);
 		glm::mat4x4 ortho = glm::ortho(-1.0f,1.0f,-1.0f, 1.0f, 1.0f, 100.0f);
-
+		//combined transformation matrix
 		glm::mat4x4 trans(1.0);
-		trans = ortho*view*translate*rotateVert*rotateHor*trans;
+		trans = persp*rotateVert*rotateHor*translate*trans;
 
+		//Pass matrix as uniform to shader vertex
 		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans));
 
 
@@ -200,24 +191,24 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
 
 
 	//Move left
-	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	if (key == GLFW_KEY_LEFT)
 	{
 		cameraPos.x += 0.05;
 	}   
 	//Move right
-	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	if (key == GLFW_KEY_RIGHT )
 	{
 		cameraPos.x -= 0.05;
 
 	}  
 	//Move up
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	if (key == GLFW_KEY_UP )
 	{
 		cameraPos.y -= 0.05;
 
 	}   
 	//Move down
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	if (key == GLFW_KEY_DOWN )
 	{
 		cameraPos.y += 0.05;
 
@@ -225,36 +216,36 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode,
 	}
 
 	//Move forward
-	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	if (key == GLFW_KEY_W )
 	{
 		cameraPos.z += 0.05;
 	}   
 	//Move backward
-	if ( key == GLFW_KEY_S && action == GLFW_PRESS)
+	if ( key == GLFW_KEY_S)
 	{
 		cameraPos.z -= 0.05;
 
 	}   
 
 	//Rotate horizontally
-	if (key == GLFW_KEY_H && action == GLFW_PRESS)
+	if (key == GLFW_KEY_H )
 	{
 		rotationX += 10;
 	}
 	//Rotate horizontally
-	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	if (key == GLFW_KEY_N )
 	{
 		rotationX -= 10;
 	}
 
 	//Rotate vertically
-	if (key == GLFW_KEY_V && action == GLFW_PRESS)
+	if (key == GLFW_KEY_V )
 	{
 		rotationY += 10;
 
 	}
 	//Rotate vertically
-	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	if (key == GLFW_KEY_F )
 	{
 		rotationY -= 10;
 
