@@ -3,9 +3,9 @@
 #include "gloom/gloom.hpp"
 #include "gloom/shader.hpp"
 #include <glm/glm.hpp>
+
 #include "sceneGraph.hpp"
 #include "sphere.hpp"
-
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 //Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -6.0f);
 GLfloat rotationY = 0;
 GLfloat rotationX = 0;
 
@@ -30,10 +30,6 @@ SceneNode* jupiter;
 SceneNode* createSolarSystem() {
 	float RGBA[] = {
 		1,0,0,1
-		
-
-		
-
 	};
 
 	//Create nodes
@@ -49,7 +45,7 @@ SceneNode* createSolarSystem() {
 	//addChild(sun, mars);
 	//addChild(sun, jupiter);
 
-	earth->vertexArrayObjectID = createCircleVAO(10, 10, RGBA);
+	earth->vertexArrayObjectID = createCircleVAO(16,16,RGBA);
 	earth->rotationSpeedRadians = (toRadians(20));
 	earth->rotationDirection = glm::vec3(1, 0, 0);
 
@@ -64,14 +60,10 @@ void update() {
 
 }
 
-
-
 void runProgram(GLFWwindow* window)
 {
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-
-
 
     // Set GLFW callback mechanism(s)
     glfwSetKeyCallback(window, keyboardCallback);
@@ -131,7 +123,7 @@ void runProgram(GLFWwindow* window)
 	GLuint indices2[] = { 0,1,2 };
 
 	//Creat the VAO with vertices and RGBA values, sizes for both the buffers and the indices. Here sizes are given to make 5 triangles. 
-	GLuint vao = createVAO(vertices, RGBA, 9 * 5, 15, 4 * 15, indices);
+	//GLuint vao = createVAO(vertices, RGBA, 9 * 5, 15, 4 * 15, indices);
 	printGLError();
 
 
@@ -172,7 +164,7 @@ void runProgram(GLFWwindow* window)
 		glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(trans));
 
 
-		glDrawElements(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 16*16*3, GL_UNSIGNED_INT, 0);
 	
 		glBindVertexArray(0);
 	

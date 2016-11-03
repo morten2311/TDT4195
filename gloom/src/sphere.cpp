@@ -17,7 +17,7 @@ unsigned int createCircleVAO(unsigned int slices, unsigned int layers, float* RG
 	unsigned int* indices = new unsigned int[triangleCount * VERTICES_PER_TRIANGLE];
 
 	//Color
-	GLfloat* RGBA = new GLfloat[triangleCount * VERTICES_PER_TRIANGLE];
+	GLfloat* RGBA = new GLfloat[triangleCount * VERTICES_PER_TRIANGLE*4];
 
 	for (int k = 0; k < (triangleCount * VERTICES_PER_TRIANGLE); k++)
 		for (int l = 0; l < (4); l++) {
@@ -123,7 +123,7 @@ unsigned int createCircleVAO(unsigned int slices, unsigned int layers, float* RG
 	// Sending the created buffers over to OpenGL.
 	// Don't forget to modify this to fit the function you created yourself!
 	// You will have to include a file which contains the implementation of this function for this to work.
-	unsigned int vao_id = createVAO(vertices, RGBA, triangleCount * VERTICES_PER_TRIANGLE * COMPONENTS_PER_VERTEX, i, 4* triangleCount * VERTICES_PER_TRIANGLE, indices);
+	unsigned int vao_id = createVAO(vertices, RGBA, triangleCount * VERTICES_PER_TRIANGLE * COMPONENTS_PER_VERTEX, 3*triangleCount, 4*triangleCount*VERTICES_PER_TRIANGLE, indices);
 
 	// Cleaning up after ourselves
 	delete[] vertices;
