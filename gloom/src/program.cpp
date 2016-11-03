@@ -3,6 +3,8 @@
 #include "gloom/gloom.hpp"
 #include "gloom/shader.hpp"
 #include <glm/glm.hpp>
+#include "sceneGraph.hpp"
+#include "sphere.hpp"
 
 
 #include <glm/mat4x4.hpp>
@@ -12,49 +14,57 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 //Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -10.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -3.0f);
 GLfloat rotationY = 0;
 GLfloat rotationX = 0;
 
 glm::mat4x4 matrix;
+SceneNode* sun;
+SceneNode* moon;
+SceneNode* earth;
+SceneNode* mars;
+SceneNode* jupiter;
 
 
-GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices,int size_index,int size_RGB,GLuint* indices) {
-	GLuint array;
-	GLuint VBO_vertices;
-	GLuint VBO_RGBA;
 
-	GLuint IB;
+SceneNode* createSolarSystem() {
+	float RGBA[] = {
+		1,0,0,1
+		
 
-	//Create VAO
-	glGenVertexArrays(1, &array);
-	glBindVertexArray(array);
-	//Create vertice buffer
-	glGenBuffers(1, &VBO_vertices);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertices);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_vertices, vertices, GL_STATIC_DRAW);
+		
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	};
 
-	// Enable the vertex attribute
-	glEnableVertexAttribArray(0);
+	//Create nodes
+	sun = createSceneNode();
+	moon = createSceneNode();
+	earth = createSceneNode();
+	mars = createSceneNode();
+	jupiter = createSceneNode();
 
-	glGenBuffers(1, &IB);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size_index, indices, GL_STATIC_DRAW);
+	//Create subgraph
+	addChild(sun, earth);
+	//addChild(earth, moon);
+	//addChild(sun, mars);
+	//addChild(sun, jupiter);
 
-	//Create RGBA buffer
-	glGenBuffers(1, &VBO_RGBA);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_RGBA);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_RGB, RGBA, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
+	earth->vertexArrayObjectID = createCircleVAO(10, 10, RGBA);
+	earth->rotationSpeedRadians = (toRadians(20));
+	earth->rotationDirection = glm::vec3(1, 0, 0);
 
 
-	return(array);
+	earth->x = 0.8;
+	earth->y = 0;
+	earth->z = 0;
+
+	return sun;
+}
+void update() {
 
 }
+
+
 
 void runProgram(GLFWwindow* window)
 {
@@ -126,6 +136,9 @@ void runProgram(GLFWwindow* window)
 
 
 
+
+	SceneNode* root = createSolarSystem();
+
     // Rendering Loop
     while (!glfwWindowShouldClose(window))
     {
@@ -135,8 +148,9 @@ void runProgram(GLFWwindow* window)
 
         // Draw your scene here
 
+		//glBindVertexArray(vao);
+		glBindVertexArray(root->children.front()->vertexArrayObjectID);
 
-		glBindVertexArray(vao);
 		// Activate shader program
 		shader.activate();
 
@@ -144,7 +158,8 @@ void runProgram(GLFWwindow* window)
 		glm::mat4x4 rotateVert = glm::rotate(glm::radians(rotationY), glm::vec3(1, 0, 0));
 		glm::mat4x4 rotateHor = glm::rotate(glm::radians(rotationX), glm::vec3(0, 1, 0));
 		glm::mat4x4 translate = glm::translate( glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
-		glm::mat4x4 scale = glm::scale(glm::vec3(1, 1, 1));
+		glm::mat4x4 scale = glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+
 		
 		//projection
 		glm::mat4x4 persp = glm::perspective(glm::radians(45.0f), GLfloat( windowWidth)/GLfloat(windowHeight),1.0f, 100.0f);
@@ -174,7 +189,42 @@ void runProgram(GLFWwindow* window)
 	shader.destroy();
 }
 
+GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices, int size_index, int size_RGB, GLuint* indices) {
+	GLuint array;
+	GLuint VBO_vertices;
+	GLuint VBO_RGBA;
 
+	GLuint IB;
+
+	//Create VAO
+	glGenVertexArrays(1, &array);
+	glBindVertexArray(array);
+	//Create vertice buffer
+	glGenBuffers(1, &VBO_vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertices);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_vertices, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	// Enable the vertex attribute
+	glEnableVertexAttribArray(0);
+
+	glGenBuffers(1, &IB);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size_index, indices, GL_STATIC_DRAW);
+
+	//Create RGBA buffer
+	glGenBuffers(1, &VBO_RGBA);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_RGBA);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*size_RGB, RGBA, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(1);
+
+
+	return(array);
+
+}
 
 
 //Move camera

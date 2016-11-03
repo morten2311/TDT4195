@@ -9,6 +9,9 @@
 #include <string>
 
 
+//VAO
+GLuint createVAO(GLfloat* vertices, GLfloat* RGBA, int size_vertices, int size_index, int size_RGB, GLuint* indices);
+
 // Main OpenGL program
 void runProgram(GLFWwindow* window);
 
