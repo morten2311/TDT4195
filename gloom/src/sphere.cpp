@@ -17,17 +17,17 @@ unsigned int createCircleVAO(unsigned int slices, unsigned int layers, float* RG
 	unsigned int* indices = new unsigned int[triangleCount * VERTICES_PER_TRIANGLE];
 
 	//Color
-	GLfloat* RGBA = new GLfloat[triangleCount * VERTICES_PER_TRIANGLE*4];
-
+	int o = 0;
+	float* RGBA = new float[triangleCount * VERTICES_PER_TRIANGLE*4];
 	for (int k = 0; k < (triangleCount * VERTICES_PER_TRIANGLE); k++)
 		for (int l = 0; l < (4); l++) {
-			RGBA[k] = RGBAColor[l];
+			RGBA[o] = RGBAColor[l];
+			o++;
 			//printf("%f", RGBA[k]);
 			//printf(" ");
 
 
-		}
-
+	}
 
 	// Slices require us to define a full revolution worth of triangles.
 	// Layers only requires angle varying between the bottom and the top (a layer only covers half a circle worth of angles)
@@ -114,6 +114,7 @@ unsigned int createCircleVAO(unsigned int slices, unsigned int layers, float* RG
 			vertices[3 * i + 0] = nextRadius * currentDirectionX;
 			vertices[3 * i + 1] = nextRadius * currentDirectionY;
 			vertices[3 * i + 2] = nextZ;
+			
 
 			indices[i] = i;
 			i++;
@@ -123,11 +124,14 @@ unsigned int createCircleVAO(unsigned int slices, unsigned int layers, float* RG
 	// Sending the created buffers over to OpenGL.
 	// Don't forget to modify this to fit the function you created yourself!
 	// You will have to include a file which contains the implementation of this function for this to work.
-	unsigned int vao_id = createVAO(vertices, RGBA, triangleCount * VERTICES_PER_TRIANGLE * COMPONENTS_PER_VERTEX, 3*triangleCount, 4*triangleCount*VERTICES_PER_TRIANGLE, indices);
+	//printf("%f", RGBA[1]);
+	//printf("%f %f %f %f %f %f %f %f", RGBA[0], RGBA[1], RGBA[2], RGBA[3], RGBA[4], RGBA[5], RGBA[6], RGBA[7]);
+	unsigned int vao_id = createVAO(vertices, RGBA, triangleCount * VERTICES_PER_TRIANGLE * COMPONENTS_PER_VERTEX, VERTICES_PER_TRIANGLE*triangleCount, 4*triangleCount*VERTICES_PER_TRIANGLE, indices);
 
 	// Cleaning up after ourselves
 	delete[] vertices;
 	delete[] indices;
+	delete[] RGBA;
 
 	return vao_id;
 }
