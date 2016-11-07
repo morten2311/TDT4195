@@ -36,26 +36,32 @@ glm::mat4 calcModel(SceneNode* node) {
 	//glm::mat4 rotateVert = glm::rotate(glm::radians(node->rotationY), glm::vec3(1, 0, 0));
 	//glm::mat4 rotateHor = glm::rotate(glm::radians(node->rotationX), glm::vec3(0, 1, 0));
 
-	glm::mat4 rotateVert = glm::rotate(glm::radians(node->rotationY),node->);
-	glm::mat4 rotateHor = glm::rotate(glm::radians(node->rotationX), glm::vec3(0, 1, 0));
+	glm::mat4 rotateVert = glm::rotate(node->rotationY,node->rotationDirection);
+	glm::mat4 rotateHor = glm::rotate(node->rotationX, node->rotationDirection);
+	glm::mat4 rotateZ = glm::rotate(node->rotationX, node->rotationDirection);
+
 
 	glm::mat4 translate = glm::translate(glm::vec3(node->x, node->y, node->z));
 	glm::mat4 scale = glm::scale(glm::vec3(node->scaleFactor, node->scaleFactor, node->scaleFactor));
-	glm::mat4 transformModel = rotateHor*rotateVert*translate*scale;
+	glm::mat4 transformModel = rotateZ*translate*scale;
 	return transformModel;
 
 }
 
 void update(SceneNode* node) {
+	//printf("%f", getTimeDeltaSeconds());
+	//printf("\n");
 	node->rotationX += (node->rotationSpeedRadians)*getTimeDeltaSeconds();
 	node->rotationY += (node->rotationSpeedRadians)*getTimeDeltaSeconds();
+	node->rotationZ += (node->rotationSpeedRadians)*getTimeDeltaSeconds();
+
 
 }
 void iterate_node(SceneNode* node, SceneNode* parent)
 {
 	update(node);
 	if (parent) {
-		node->currentTransformationMatrix = calcModel(node)*peekMatrix(stack);
+		node->currentTransformationMatrix = peekMatrix(stack)*calcModel(node);
 	}
 	else {
 		node->currentTransformationMatrix = calcModel(node);
@@ -99,50 +105,55 @@ SceneNode* createSolarSystem() {
 
 	//Set parameters
 	sun->vertexArrayObjectID = createCircleVAO(slices, layers, yellow);
-	sun->rotationSpeedRadians = (toRadians(360));
-	sun->rotationDirection = glm::vec3(0, 1, 0);
+	sun->rotationSpeedRadians = (toRadians(60));
+	//sun->rotationX;
+	//sun->rotationY;
+	//sun->rotationZ;
+	sun->rotationDirection = glm::vec3(0, 0, 1);
 	sun->scaleFactor = 1;
 	sun->x = 0;
 	sun->y = 0;
 	sun->z = 0;
 
 	earth->vertexArrayObjectID = createCircleVAO(slices, layers, blue);
-	earth->rotationSpeedRadians = (toRadians(40));
-	earth->rotationDirection = glm::vec3(0, 1, 0);
+	earth->rotationSpeedRadians = (toRadians(300));
+	earth->rotationDirection = glm::vec3(0, 0, 1);
 	earth->scaleFactor = 0.5;
 	earth->x = 2;
 	earth->y = 0;
 	earth->z = 0;
 
 	moon->vertexArrayObjectID = createCircleVAO(slices, layers, white);
-	moon->rotationSpeedRadians = (toRadians(20));
-	moon->rotationDirection = glm::vec3(1, 0, 0);
-	moon->scaleFactor = 0.2;
-	moon->x = 3;
+	moon->rotationSpeedRadians = (toRadians(1500));
+	moon->rotationDirection = glm::vec3(0, 0, 1);
+	moon->scaleFactor = 0.3;
+	moon->x = 2;
 	moon->y = 0;
 	moon->z = 0;
 
 	mars->vertexArrayObjectID = createCircleVAO(slices, layers, red);
-	mars->rotationSpeedRadians = (toRadians(20));
-	mars->rotationDirection = glm::vec3(1, 0, 0);
+	mars->rotationSpeedRadians = (toRadians(-200));
+	mars->rotationDirection = glm::vec3(0, 0, 1);
 	mars->scaleFactor = 0.3;
-	mars->x = 5;
+	mars->x = 4;
 	mars->y = 0;
 	mars->z = 0;
 
 	jupiter->vertexArrayObjectID = createCircleVAO(slices, layers, brown);
-	jupiter->rotationSpeedRadians = (toRadians(20));
-	jupiter->rotationDirection = glm::vec3(1, 0, 0);
+	jupiter->rotationSpeedRadians = (toRadians(-5000));
+	jupiter->rotationDirection = glm::vec3(0, 0, 1);
 	jupiter->scaleFactor = 0.7;
-	jupiter->x = 7;
+	jupiter->x = 6;
 	jupiter->y = 0;
 	jupiter->z = 0;
 
 	//Create subgraph
 	addChild(sun, mars);
 	addChild(sun, jupiter);
-	addChild(earth, moon);
 	addChild(sun, earth);
+	addChild(earth, moon);
+
+	printNode(earth);
 
 	return sun;
 }
